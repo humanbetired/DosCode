@@ -7,7 +7,7 @@ approval sebelum posting ke GitHub PR.
 ## Architecture
 
 ```
-![Architecture](./architecture/flow.png)
+![architecture/flow.png](./architecture/flow.png)
 ```
 
 ## Key Features
