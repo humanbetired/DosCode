@@ -1,0 +1,30 @@
+# Core Agent
+langgraph
+langchain
+langchain-ollama
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-chroma
+
+# Embedding & Vector Store
+chromadb
+sentence-transformers
+
+# Static Analysis Tools
+ruff
+bandit
+radon
+
+# GitHub Integration
+PyGithub
+python-dotenv
+
+# Backend
+fastapi
+uvicorn
+sse-starlette
+python-multipart
+
+# Observability
+langfuse

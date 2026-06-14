@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────────────────
+  reviewagent-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: reviewagent-api
+    ports:
+      - "8000:8000"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_HOST=${LANGFUSE_HOST}
+      # Ollama di host — gunakan host.docker.internal
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    volumes:
+      # Persist ChromaDB dan checkpoints
+      - ./data:/app/data
+      - ./knowledge_base:/app/knowledge_base
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend ───────────────────────────────────────
+  reviewagent-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: reviewagent-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      reviewagent-api:
+        condition: service_healthy
+    restart: unless-stopped
