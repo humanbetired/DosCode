@@ -52,6 +52,7 @@ vector_store = build_vector_store()
 
 @tool
 def query_style_guide(query: str) -> str:
+    """Query the team coding standards and style guide documentation to check best practices."""
     try:
         results = vector_store.similarity_search(query, k=3)
 

@@ -4,6 +4,7 @@ from langchain_core.tools import tool
 
 @tool
 def run_linter(file_path: str) -> str:
+    """Run ruff linter on a Python file and return style and lint issues found."""
     try:
         result = subprocess.run(
             ["ruff", "check", file_path, "--output-format", "json"],

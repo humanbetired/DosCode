@@ -15,6 +15,7 @@ def get_github_client():
 
 @tool
 def fetch_pr_diff(repo_name: str, pr_number: int) -> str:
+    """Fetch the code diff from a GitHub Pull Request and return changed files with their diffs."""
     try:
         g = get_github_client()
         repo = g.get_repo(repo_name)
@@ -44,6 +45,7 @@ def fetch_pr_diff(repo_name: str, pr_number: int) -> str:
 
 @tool
 def post_review_comment(repo_name: str, pr_number: int, comment: str) -> str:
+    """Post a review comment to a GitHub Pull Request after human approval."""
     try:
         g = get_github_client()
         repo = g.get_repo(repo_name)

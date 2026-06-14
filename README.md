@@ -5,10 +5,12 @@ LangGraph dynamic routing, RAG-based style guide lookup, dan human-in-the-loop
 approval sebelum posting ke GitHub PR.
 
 ## Architecture
+![Architecture](./architecture/flow.png)
+![Home](./architecture/home.png)
+![Upload](./architecture/upload.png) 
+![Progress](./architecture/progress.png)
+![Result](./architecture/result.png)
 
-```
-![architecture/flow.png](./architecture/flow.png)
-```
 
 ## Key Features
 - **Agentic behavior** — LLM decides which tools to call and when

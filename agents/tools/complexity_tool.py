@@ -4,6 +4,7 @@ from langchain_core.tools import tool
 
 @tool
 def run_complexity_check(file_path: str) -> str:
+    """Run radon cyclomatic complexity check on a Python file to detect overly complex functions."""
     try:
         result = subprocess.run(
             ["radon", "cc", file_path, "-s", "-a"],

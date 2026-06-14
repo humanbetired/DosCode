@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Annotated, Literal, Optional
 from typing_extensions import TypedDict
 
@@ -13,7 +14,10 @@ from agents.tools.security_tool import run_security_scan
 from agents.tools.complexity_tool import run_complexity_check
 from agents.tools.rag_tool import query_style_guide
 from agents.tools.github_tool import fetch_pr_diff, post_review_comment
+from dotenv import load_dotenv
+load_dotenv()
 
+os.environ.pop("OLLAMA_HOST", None)
 
 class ReviewState(TypedDict):
     messages: Annotated[list, add_messages]
@@ -32,11 +36,12 @@ class ReviewState(TypedDict):
     pr_diff: Optional[str]
     human_approved: Optional[bool]
 
+OLLAMA_HOST = "http://127.0.0.1:11434"
 
 llm = ChatOllama(
     model="qwen2.5:1.5b",
     temperature=0,
-    base_url=("OLLAMA_HOST", "http://127.0.0.1:11434")
+    base_url=OLLAMA_HOST
 )
 
 
@@ -99,27 +104,43 @@ Security: {state.get('security_results', 'N/A')}
 Complexity: {state.get('complexity_results', 'N/A')}
 {rag_context}
 
-Respond in JSON only:
+Respond in JSON only, no other text:
 {{
   "severity": "low|medium|high|critical",
   "needs_rag_lookup": true|false,
   "reasoning": "brief explanation"
 }}"""
 
-    response = llm.invoke([
-        SystemMessage(content="Respond with valid JSON only."),
-        HumanMessage(content=prompt)
-    ])
-
     try:
+        response = llm.invoke([
+            SystemMessage(content="You are a code review assistant. Respond with valid JSON only. No markdown, no explanation, just JSON."),
+            HumanMessage(content=prompt)
+        ])
+
         raw = response.content.strip()
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
+        print(f"  → LLM raw response: {raw[:200]}")
+
+        # Strip semua kemungkinan markdown wrapper
+        if "```json" in raw:
+            raw = raw.split("```json")[1].split("```")[0]
+        elif "```" in raw:
+            raw = raw.split("```")[1].split("```")[0]
+
+        # Cari JSON object di dalam response
+        import re
+        json_match = re.search(r'\{.*\}', raw, re.DOTALL)
+        if json_match:
+            raw = json_match.group()
+
         result = json.loads(raw.strip())
-    except Exception:
-        result = {"severity": "medium", "needs_rag_lookup": False, "reasoning": "Parse error"}
+
+    except json.JSONDecodeError as e:
+        print(f"  → JSON parse error: {e}")
+        print(f"  → Raw was: {raw}")
+        result = {"severity": "medium", "needs_rag_lookup": False, "reasoning": "Parse error fallback"}
+    except Exception as e:
+        print(f"  → Evaluator error: {e}")
+        result = {"severity": "medium", "needs_rag_lookup": False, "reasoning": "Error fallback"}
 
     severity = result.get("severity", "medium")
     print(f"  → Severity: {severity}")

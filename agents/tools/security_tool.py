@@ -5,6 +5,7 @@ from langchain_core.tools import tool
 
 @tool
 def run_security_scan(file_path: str) -> str:
+    """Run bandit security scanner on a Python file to detect vulnerabilities and hardcoded credentials."""
     try:
         result = subprocess.run(
             ["bandit", "-f", "json", "-q", file_path],
