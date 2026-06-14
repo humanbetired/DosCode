@@ -45,16 +45,3 @@ docker-compose up
 # 4. Open browser
 open http://localhost:3000
 ```
-
-## Evaluation Results
-| Metric | Score |
-|--------|-------|
-| Severity detection (±1 level) | 80% |
-| Security recall | 100% |
-| Avg response time | ~34s |
-
-## What Makes This Different from MediAgent
-MediAgent uses a fixed linear pipeline. ReviewAgent implements true agentic 
-behavior — the LLM dynamically decides tool selection, loops back for deeper 
-investigation when needed, and requires human approval before taking real-world 
-actions.
